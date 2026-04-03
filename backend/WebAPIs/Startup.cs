@@ -1,9 +1,12 @@
 ﻿using Asp.Versioning;
 using DataAccess;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using DataAccess.Identity;
 
 namespace WebAPIs
 {
@@ -18,6 +21,14 @@ namespace WebAPIs
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddInfrastructure(Configuration);
+            services.AddLogging(loggingBuilder =>
+            {
+                loggingBuilder.ClearProviders();
+                loggingBuilder.AddConsole();
+                loggingBuilder.AddDebug();
+                loggingBuilder.SetMinimumLevel(LogLevel.Debug);
+            });
             services.AddCors(options =>
             {
                 options.AddPolicy("AllowLocalhost3000",
@@ -30,7 +41,29 @@ namespace WebAPIs
                     });
             });
 
-            // Cấu hình JWT Authentication
+            // ==================== DATABASE & IDENTITY ====================
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseMySql(
+                    Configuration.GetConnectionString("DefaultConnection"),
+                    ServerVersion.AutoDetect(Configuration.GetConnectionString("DefaultConnection"))
+                ));
+
+
+
+            // ==================== IDENTITY ====================
+            services.AddIdentity<IdentityUser, IdentityRole>(options =>
+            {
+                options.SignIn.RequireConfirmedAccount = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequiredLength = 6;
+                options.Password.RequireDigit = true;
+                options.Password.RequireLowercase = true;
+                options.Password.RequireUppercase = true;
+            })
+            .AddEntityFrameworkStores<ApplicationDbContext>()
+            .AddDefaultTokenProviders();
+
+            // ==================== JWT ====================
             var jwtSettings = Configuration.GetSection("Jwt");
             var key = Encoding.UTF8.GetBytes(jwtSettings["Key"]);
 
@@ -49,6 +82,7 @@ namespace WebAPIs
                     };
                 });
 
+            // Phần còn lại giữ nguyên
             #region Api Versioning
             services.AddApiVersioning(config =>
             {
@@ -60,16 +94,16 @@ namespace WebAPIs
 
             services.AddApplication();
             services.AddInfrastructure(Configuration);
+
             services.AddControllers().AddNewtonsoftJson(options =>
                 options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
             );
+
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(options =>
             {
-                // Thêm định nghĩa cho Swagger
                 options.SwaggerDoc("v1", new OpenApiInfo { Title = "My API", Version = "v1" });
 
-                // Thêm header JWT vào Swagger
                 options.AddSecurityDefinition("JWT", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -87,44 +121,36 @@ namespace WebAPIs
                             Reference = new OpenApiReference
                             {
                                 Type = ReferenceType.SecurityScheme,
-                                Id = "JWT"  // Tên định nghĩa "JWT"
+                                Id = "JWT"
                             }
                         },
                         new string[] { }
                     }
                 });
 
-                // Cấu hình CustomSchemaIds (tuỳ chọn, dùng để thay đổi cách đặt tên schema)
                 options.CustomSchemaIds(type => type.FullName.Replace("+", "_"));
             });
 
-            services.AddControllers();
-
-
-
             services.AddHttpContextAccessor();
         }
-
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
                 app.UseSwagger();
-                //app.UseSwaggerUI();
                 app.UseSwaggerUI(c =>
                 {
-                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "My API V1");
+                    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Personal Finance Management API V1");
                 });
             }
 
             app.UseHttpsRedirection();
-
             app.UseRouting();
 
             app.UseCors("AllowLocalhost3000");
 
-            app.UseAuthentication(); // JWT Middleware
+            app.UseAuthentication();   // Quan trọng cho JWT + Identity
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
