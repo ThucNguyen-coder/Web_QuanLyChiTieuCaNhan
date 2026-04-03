@@ -18,27 +18,70 @@ Phần mềm quản lý tài chính cá nhân là công cụ hỗ trợ người
 
 ## Cài đặt và sử dụng chương trình
 
-Thực hiện các bước sau (yêu cầu đã cài sẵn Visual Studio, Laragon để đảm bảo trải nghiệm tốt nhất)
+Hướng dẫn chạy dự án (VS Code + Laragon)
+Yêu cầu trước khi chạy
 
-1. Clone hoặc tải dự án này về máy cá nhân.
-2. Mở dự án trong Visual Studio ở thư mục Backend.
-3. Khởi chạy máy chủ MySQL bằng laragon hay bất kỳ phần mềm nào có hỗ trợ hệ quản trị CSDL MySQL, tạo bảng với tên "ef".
-4. Điều chỉnh lại thông tin kết nối đến CSDL thông qua chuỗi connection string.
-```json
-"ConnectionStrings": {
-  ...
-  "DefaultConnection": "server=localhost;user=root;password=;database=ef"
-  ...
-},
+Đã cài Visual Studio Code
+Đã cài Laragon (để chạy MySQL + phpMyAdmin)
+Đã cài .NET SDK 8.0
+Đã cài Node.js (để chạy frontend)
+
+1. Chuẩn bị Database (Laragon)
+
+Mở Laragon → Start All (Apache + MySQL)
+Mở phpMyAdmin (thường là http://localhost/phpmyadmin)
+Tạo một database mới với tên: ef
+
+2. Clone / Tải dự án
+```Bash
+git clone <link-repo-của-bạn>
+cd PersonalFinanceManagement
 ```
-5. Chạy dự án bằng nút Run của IDE để khởi chạy phần xử lý Backend.
-6. Ở cửa sổ Output, chọn tab Package Manager Console ở bên dưới cùng, chọn Default project là DataAccess, rồi gõ lệnh update-database để chạy migration nếu chạy project lần đầu.
-7. Mở thư mục frontend, sau đó mở CMD và gõ lệnh sau để khởi chạy phần xử lý Frontend.
-```bash
-npm i
+4. Cấu hình Backend (VS Code)
+
+Mở Visual Studio Code
+Mở thư mục backend của dự án
+Chỉnh sửa file kết nối database:
+Vào đường dẫn: backend/WebAPIs/appsettings.Development.json (hoặc appsettings.json)
+Sửa phần ConnectionStrings như sau:
+
+```JSON
+"ConnectionStrings": {
+  "DefaultConnection": "server=localhost;port=3306;user=root;password=;database=ef;SslMode=None;AllowPublicKeyRetrieval=true"
+}
+```
+Lưu ý: Nếu bạn đã đặt password cho root MySQL thì điền vào phần password=
+4. Chạy Backend
+Mở Terminal trong VS Code (Ctrl + `) và chạy lần lượt các lệnh sau:
+```PowerShell
+# Đi đến thư mục backend
+cd backend
+
+# Restore và build
+dotnet restore
+dotnet build
+
+# Chạy Backend
+dotnet run --project WebAPIs
+```
+Backend sẽ chạy ở cổng thường là http://localhost:5000 hoặc https://localhost:5001
+5. Chạy Frontend
+Mở một Terminal mới (Ctrl + Shift + `), sau đó chạy:
+```PowerShell
+# Đi đến thư mục frontend
+cd frontend
+
+# Cài đặt package
+npm install
+
+# Chạy frontend
 npm run dev
 ```
-8. Truy cập theo địa chỉ mà màn hình CMD chỉ dẫn để bắt đầu sử dụng ứng dụng.
+Frontend thường sẽ chạy ở địa chỉ: http://localhost:3000
+6. Sử dụng ứng dụng
+
+Truy cập: http://localhost:3000
+Đăng ký / Đăng nhập để sử dụng
 
 ## Tổng quan ứng dụng thông qua giao diện màn hình
 
@@ -59,12 +102,10 @@ Giao diện thống kê theo tài khoản giao dịch
 
 | STT    | MSSV       | Họ và tên             | Tỷ lệ đóng góp |
 | ------ | ---------- | --------------------- | -------------- |
-| 1      | 3121410023 |	Tiền Minh Vy          | 15%            |
-| 2      | 3121410387	| Trần Trọng Phú        | 17%            |
-| 3      | 3121410502 |	Phan Huỳnh Minh Tiến  | 19%            |
-| 4      | 3121410336	| Trần Đăng Nam         | 19%            |
-| 5      | 3121560057	| Nguyễn Khánh Nam      | 15%            |
-| 6      | 3121560023	| Võ Khương Duy         | 15%            |
+| 1      | 124000698  |	Nguyễn Huỳnh Duy Thức | 25%            |
+| 2      | 124000855	| Trần Lê Thiện Trung   | 25%            |
+| 3      | 124000259  |	Nguyễn Diệu Hữu       | 25%            |
+| 4      | 124000521	| Phan Bảo Anh          | 25%            |
 |        |            | Tổng                  | 100%           |
 
 ## Liên hệ
