@@ -22,7 +22,6 @@ namespace DataAccess
                     ServerVersion.AutoDetect(configuration.GetConnectionString("DefaultConnection"))
                 ));
             
-            services.AddScoped<IApplicationDbContext, ApplicationDbContext>();    
             return services;
         }
     }
