@@ -5,7 +5,7 @@ const FooterLayout = () => {
     <Footer
       className="text-center font-bad-script"
     >
-      Copyright © {new Date().getFullYear()} Phát triển bởi <span className="font-bold">Nhóm 1</span>
+      Copyright © {new Date().getFullYear()} Phát triển bởi <span className="font-bold">Nhóm Low Cortisol</span>
     </Footer>
   );
 };

@@ -59,17 +59,17 @@ const HomeLayout = () => {
         <Footer className="text-center bg-slate-400 py-4 md:py-8">
           <div className="mb-4">
             <Space size="large">
-              <Link to="https://github.com/trandangnam">
+              <Link to="https://github.com/ThucNguyen-coder">
                 <GithubOutlined className="text-xl md:text-2xl hover:text-blue-500 transition-colors duration-300 cursor-pointer" />
               </Link>
-              <Link to="https://www.facebook.com/profile.php?id=100027954192211&mibextid=ZbWKwL">
+              <Link to="https://www.facebook.com/thuc.nguyenhuynhduy">
                 <FacebookOutlined className="text-xl md:text-2xl hover:text-blue-500 transition-colors duration-300 cursor-pointer" />
               </Link>
             </Space>
           </div>
           <Typography.Text className="text-gray-600 text-sm md:text-base font-bad-script">
             Ant Design ©{new Date().getFullYear()} Phát triển bởi{" "}
-            <span className="font-bold">Nhóm 1</span>
+            <span className="font-bold">Nhóm Low Cortisol</span>
           </Typography.Text>
         </Footer>
       </Layout>
